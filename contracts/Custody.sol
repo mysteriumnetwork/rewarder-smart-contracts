@@ -7,10 +7,10 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 
 contract Custody is Ownable {
-   using SafeERC20 for IERC20;
-   using Address for address;
+    using SafeERC20 for IERC20;
+    using Address for address;
 
-   mapping(address => bool) public authorized;
+    mapping(address => bool) public authorized;
 
     modifier onlyAuthorized() {
         require(authorized[msg.sender], "Not authorized");
