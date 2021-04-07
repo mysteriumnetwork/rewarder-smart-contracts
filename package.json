@@ -1,4 +1,7 @@
 {
+  "name": "rewarder-smart-contracts",
+  "description": "Smart contracts for Mysterium Network referral and bounty programs",
+  "license": "GPL-3.0",
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
