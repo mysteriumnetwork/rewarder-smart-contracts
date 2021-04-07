@@ -26,7 +26,7 @@ describe("Custody contract", function () {
     });
 
     it("Should allow to withdraw funds for owner", async function () {
-        await custody.withdraw(token.address, 1000);
+        await custody.withdraw(token.address, 1000, { from: owner.address });
         expect(await token.balanceOf(owner.address)).to.equal(1000);
     });
 
@@ -53,4 +53,11 @@ describe("Custody contract", function () {
         expect(await custody.authorized(addr2.address)).to.equal(true);
         expect(await custody.owner()).to.equal(addr2.address);
     });
+
+    it("Should reject withdraw funds for not authorized users / old owner", async function () {
+        const initialBalance = await token.balanceOf(owner.address)
+
+        await expect(custody.withdraw(token.address, 1000)).to.be.revertedWith('Not authorized');
+        expect(await token.balanceOf(owner.address)).to.equal(initialBalance);
+    })
 });
