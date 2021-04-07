@@ -1,17 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.7.6;
+pragma solidity 0.8.3;
 
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./Custody.sol";
 
 contract Rewarder is Ownable {
-    using SafeERC20 for IERC20;
-    using SafeMath for uint256;
     using MerkleProof for bytes32[];
 
     IERC20 public token;
@@ -46,12 +42,12 @@ contract Rewarder is Ownable {
             uint256 _totalEarned = _totalEarnings[i];
             uint256 _totalReceived = totalPayoutsFor[_beneficiary];
             require(_totalEarned >= _totalReceived, "Invalid batch");
-            uint256 _amount = _totalEarned.sub(_totalReceived);
+            uint256 _amount = _totalEarned - _totalReceived;
 
             if (_amount == 0) continue;
 
             amounts[i] = _amount;
-            _total = _total.add(_amount);
+            _total = _total + _amount;
             totalPayoutsFor[_beneficiary] = _totalEarned;
         }
 
@@ -59,7 +55,7 @@ contract Rewarder is Ownable {
 
         increaseClaimed(_total);
         for (uint256 i = 0; i < _beneficiaries.length; i++) {
-            token.safeTransfer(_beneficiaries[i], amounts[i]);
+            token.transfer(_beneficiaries[i], amounts[i]);
         }
         emit Airdrop(_total);
     }
@@ -69,7 +65,7 @@ contract Rewarder is Ownable {
         require(lastRootBlock < _blockNumber, "Given block number must be more than last root block");
         require(_totalReward >= totalClaimed, "Total reward must be bigger than total claimed");
 
-        uint256 _requiredTokens = _totalReward.sub(totalClaimed);
+        uint256 _requiredTokens = _totalReward - totalClaimed;
         if (_requiredTokens > token.balanceOf(address(this))) {
             custody.withdraw(address(token), _requiredTokens);
         }
@@ -85,12 +81,12 @@ contract Rewarder is Ownable {
         uint256 _totalReceived = totalPayoutsFor[_recipient];
         require(_totalEarned >= _totalReceived, "Already paid");
 
-        uint256 _amount = _totalEarned.sub(_totalReceived);
+        uint256 _amount = _totalEarned - _totalReceived;
         if (_amount == 0) return;
 
         totalPayoutsFor[_recipient] = _totalEarned;
         increaseClaimed(_amount);
-        token.safeTransfer(_recipient, _amount);
+        token.transfer(_recipient, _amount);
     }
 
     function isValidProof(address _recipient, uint256 _totalEarned, uint256 _blockNumber, bytes32[] calldata _proof) public view returns (bool) {
@@ -108,11 +104,11 @@ contract Rewarder is Ownable {
         uint256 _balance = _erc20.balanceOf(address(this));
 
         require(_balance >= _amount, "Given _amount is larger than recoverable balance");
-        _erc20.safeTransfer(_to, _amount);
+        _erc20.transfer(_to, _amount);
     }
 
     function increaseClaimed(uint256 delta) internal {
-        totalClaimed = totalClaimed.add(delta);
+        totalClaimed = totalClaimed + delta;
         emit ClaimedChanged(totalClaimed);
     }
 }
