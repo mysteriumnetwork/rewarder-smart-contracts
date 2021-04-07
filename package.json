@@ -19,6 +19,6 @@
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.1.0",
     "keccak256": "^1.0.2",
-    "merkletreejs": "^0.2.16"
+    "merkletreejs": "^0.2.18"
   }
 }
