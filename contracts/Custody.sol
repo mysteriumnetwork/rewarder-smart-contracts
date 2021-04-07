@@ -20,6 +20,11 @@ contract Custody is Ownable {
         authorized[owner()] = true;
     }
 
+    // Reject any ethers sent to this smart-contract
+    receive() external payable {
+        revert("Rejecting tx with ethers sent");
+    }
+
     function authorize(address _account) public onlyOwner {
         authorized[_account] = true;
     }
@@ -35,8 +40,6 @@ contract Custody is Ownable {
         super.transferOwnership(newOwner);
         authorized[owner()] = true;
     }
-
-    receive() external payable {}
 
     function withdraw(address token, uint256 amount) onlyAuthorized public {
         IERC20(token).transfer(msg.sender, amount);
