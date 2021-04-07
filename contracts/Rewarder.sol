@@ -67,7 +67,7 @@ contract Rewarder is Ownable {
 
         uint256 _requiredTokens = _totalReward - totalClaimed;
         if (_requiredTokens > token.balanceOf(address(this))) {
-            custody.withdraw(address(token), _requiredTokens);
+            custody.withdraw(_requiredTokens);
         }
 
         lastRootBlock = _blockNumber;

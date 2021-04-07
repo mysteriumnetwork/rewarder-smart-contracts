@@ -25,7 +25,7 @@ describe("Rewarder contract", function () {
         chainId = await owner.getChainId();
         token = await Token.deploy();
         token2 = await Token.deploy();
-        custody = await Custody.deploy();
+        custody = await Custody.deploy(token.address);
         rewarder = await Rewarder.deploy(token.address, custody.address);
 
         await token.mint(custody.address, 100000000000);
@@ -45,8 +45,8 @@ describe("Rewarder contract", function () {
     it("Should update root and allow to claim for one address", async function () {
         // Produce a merkle tree with a single leaf node which will be our addr1.
         const amount = 1000;
-        const leaf1 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr1.address,amount,chainId,rewarder.address]);
-        const tree = new MerkleTree([leaf1], keccak256, {sort: true});
+        const leaf1 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr1.address, amount, chainId, rewarder.address]);
+        const tree = new MerkleTree([leaf1], keccak256, { sort: true });
 
         expect(await token.balanceOf(rewarder.address)).to.equal(0);
         const currentBlock = await rewarder.lastRootBlock();
@@ -56,9 +56,9 @@ describe("Rewarder contract", function () {
         const currentBlockRoots = await rewarder.claimRoots(newBlock);
         const hexRoot = tree.getHexRoot();
 
-        await rewarder.updateRoot(hexRoot, newBlock, amount*2);
+        await rewarder.updateRoot(hexRoot, newBlock, amount * 2);
         // Check that rewarder contract was updated after updating root.
-        expect(await token.balanceOf(rewarder.address)).to.equal(amount*2);
+        expect(await token.balanceOf(rewarder.address)).to.equal(amount * 2);
         expect(await rewarder.lastRootBlock()).to.equal(newBlock);
         expect(await rewarder.claimRoots(newBlock)).to.not.equal(currentBlockRoots);
 
@@ -77,9 +77,9 @@ describe("Rewarder contract", function () {
         // Produce a merkle tree with a two leaf nodes which will be our addr1 and addr2.
         // We will do an airdrop for both of them.
         const amount = 2000;
-        const leaf1 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr1.address,amount,chainId,rewarder.address]);
-        const leaf2 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr2.address,amount,chainId,rewarder.address]);
-        const tree = new MerkleTree([leaf1, leaf2], keccak256, {sort: true});
+        const leaf1 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr1.address, amount, chainId, rewarder.address]);
+        const leaf2 = ethers.utils.solidityKeccak256(['address', 'uint256', 'uint256', 'address'], [addr2.address, amount, chainId, rewarder.address]);
+        const tree = new MerkleTree([leaf1, leaf2], keccak256, { sort: true });
 
         const currentBlock = await rewarder.lastRootBlock();
         await hre.network.provider.send("evm_mine");
@@ -89,8 +89,8 @@ describe("Rewarder contract", function () {
         const hexRoot = tree.getHexRoot();
 
         // Check that rewarder contract was updated after updating root.
-        await rewarder.updateRoot(hexRoot, newBlock, amount*2);
-        expect(await token.balanceOf(rewarder.address)).to.equal(amount*2);
+        await rewarder.updateRoot(hexRoot, newBlock, amount * 2);
+        expect(await token.balanceOf(rewarder.address)).to.equal(amount * 2);
         expect(await rewarder.lastRootBlock()).to.equal(newBlock);
         expect(await rewarder.claimRoots(newBlock)).to.not.equal(currentBlockRoots);
 
@@ -102,7 +102,7 @@ describe("Rewarder contract", function () {
 
         // Total claimed is equal to both addresses claimed amount sum
         const totalClaimed = await rewarder.totalClaimed();
-        expect(totalClaimed).to.equal(amount*2);
+        expect(totalClaimed).to.equal(amount * 2);
     });
 
     it("Should should allow to recover tokens", async function () {
