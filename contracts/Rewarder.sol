@@ -100,12 +100,10 @@ contract Rewarder is Ownable {
         return _proof.verify(root, leaf);
     }
 
-    function recoverTokens(IERC20 _erc20, address _to, uint256 _amount) public onlyOwner {
+    function recoverTokens(IERC20 _erc20, address _to) public onlyOwner {
         require(address(_erc20) != address(token), "You can't recover default token");
         uint256 _balance = _erc20.balanceOf(address(this));
-
-        require(_balance >= _amount, "Given _amount is larger than recoverable balance");
-        _erc20.transfer(_to, _amount);
+        _erc20.transfer(_to, _balance);
     }
 
     function increaseClaimed(uint256 delta) internal {
