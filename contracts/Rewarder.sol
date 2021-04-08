@@ -62,12 +62,13 @@ contract Rewarder is Ownable {
 
     function updateRoot(bytes32 _claimRoot, uint256 _blockNumber, uint256 _totalReward) public onlyOwner {
         require(_blockNumber < block.number, "Given block number must be less than current block number");
-        require(lastRootBlock < _blockNumber, "Given block number must be more than last root block");
-        require(_totalReward >= totalClaimed, "Total reward must be bigger than total claimed");
+        require(_blockNumber > lastRootBlock, "Given block number must be more than last root block");
+        require(_totalReward > totalClaimed, "Total reward must be bigger than total claimed");
 
         uint256 _requiredTokens = _totalReward - totalClaimed;
-        if (_requiredTokens > token.balanceOf(address(this))) {
-            custody.withdraw(_requiredTokens);
+        uint256 _currentBalance = token.balanceOf(address(this));
+        if (_requiredTokens > _currentBalance) {
+            custody.withdraw(_requiredTokens - _currentBalance);
         }
 
         lastRootBlock = _blockNumber;

@@ -13,7 +13,6 @@ describe("Rewarder contract", function () {
     let addrs;
     let chainId;
 
-
     before(async function () {
         // Get the ContractFactory and Signers here.
         const Token = await ethers.getContractFactory("Token");
@@ -56,9 +55,10 @@ describe("Rewarder contract", function () {
         const currentBlockRoots = await rewarder.claimRoots(newBlock);
         const hexRoot = tree.getHexRoot();
 
-        await rewarder.updateRoot(hexRoot, newBlock, amount * 2);
+        await rewarder.updateRoot(hexRoot, newBlock, amount);
+
         // Check that rewarder contract was updated after updating root.
-        expect(await token.balanceOf(rewarder.address)).to.equal(amount * 2);
+        expect(await token.balanceOf(rewarder.address)).to.equal(amount);
         expect(await rewarder.lastRootBlock()).to.equal(newBlock);
         expect(await rewarder.claimRoots(newBlock)).to.not.equal(currentBlockRoots);
 
@@ -71,6 +71,7 @@ describe("Rewarder contract", function () {
         // After claiming we should have the whole claimed amount and totalclaimed should be updated.
         expect(await token.balanceOf(addr1.address)).to.equal(amount);
         expect(await rewarder.totalClaimed()).to.equal(amount);
+        expect(await token.balanceOf(rewarder.address)).to.equal(0);
     });
 
     it("Should update root and do an airdrop for two addresses", async function () {
@@ -84,18 +85,20 @@ describe("Rewarder contract", function () {
         const currentBlock = await rewarder.lastRootBlock();
         await hre.network.provider.send("evm_mine");
         const newBlock = currentBlock.add(1);
+        const claimedAmount = await rewarder.totalClaimed();
 
         const currentBlockRoots = await rewarder.claimRoots(newBlock);
         const hexRoot = tree.getHexRoot();
 
         // Check that rewarder contract was updated after updating root.
         await rewarder.updateRoot(hexRoot, newBlock, amount * 2);
-        expect(await token.balanceOf(rewarder.address)).to.equal(amount * 2);
+        expect(await token.balanceOf(rewarder.address)).to.equal(amount * 2 - claimedAmount);
         expect(await rewarder.lastRootBlock()).to.equal(newBlock);
         expect(await rewarder.claimRoots(newBlock)).to.not.equal(currentBlockRoots);
 
         // Do the airdrop and check that both balances have been updated to the correct amount.
         await rewarder.airdrop([addr1.address, addr2.address], [amount, amount]);
+
         // eventhough addr1 already had 1000, it's balance should be equal to amount paid out. It should not be added total balance.
         expect(await token.balanceOf(addr1.address)).to.equal(amount);
         expect(await token.balanceOf(addr2.address)).to.equal(amount);
