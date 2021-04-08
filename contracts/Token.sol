@@ -13,9 +13,4 @@ contract Token is ERC20 {
     function mint(address _account, uint _amount) public {
         _mint(_account, _amount);
     }
-
-    uint256 internal jumps;
-    function moveBlock() public {
-        jumps = jumps + 1;
-    }
 }
