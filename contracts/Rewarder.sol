@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.3;
 
-
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Custody.sol";
+
 
 contract Rewarder is Ownable {
     using MerkleProof for bytes32[];
@@ -93,8 +93,9 @@ contract Rewarder is Ownable {
     function isValidProof(address _recipient, uint256 _totalEarned, uint256 _blockNumber, bytes32[] calldata _proof) public view returns (bool) {
         uint256 chainId;
         assembly {
-        chainId := chainid()
-                }
+            chainId := chainid()
+        }
+
         bytes32 leaf = keccak256(abi.encodePacked(_recipient, _totalEarned, chainId, address(this)));
         bytes32 root = claimRoots[_blockNumber];
         return _proof.verify(root, leaf);
