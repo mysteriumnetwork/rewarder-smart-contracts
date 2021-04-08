@@ -112,11 +112,10 @@ describe("Rewarder contract", function () {
         const token2Balance = await token2.balanceOf(rewarder.address);
 
         await token2.mint(rewarder.address, 1000);
-        await rewarder.recoverTokens(token2.address, owner.address, 1000);
+        await rewarder.recoverTokens(token2.address, owner.address);
 
         // Tokens should be returned to the owner and removed from rewarder.
         expect(await token2.balanceOf(rewarder.address)).to.equal(0);
         expect(await token2.balanceOf(owner.address)).to.equal(1000);
     });
 });
-
