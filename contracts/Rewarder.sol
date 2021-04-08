@@ -1,174 +1,114 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.7.6;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.3;
 
-
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./Custody.sol";
 
+
 contract Rewarder is Ownable {
-  using SafeERC20 for IERC20;
-  using SafeMath for uint256;
-  using MerkleProof for bytes32[];
+    using MerkleProof for bytes32[];
 
-  IERC20 public token;
-  Custody public custody;
-  mapping(uint256 => bytes32) public claimRoots;
-  mapping(address => uint256) public totalPayoutsFor;
-  mapping(address => bool) public banlist;
-  uint256 public lastBlockNumber;
-  uint256 public lastBlocksPeriod;
-  uint256 public pricePerBlock;
-  uint256 public totalUnclaimed;
-  uint256 public deployBlock;
-  uint256 public lastRootBlock;
+    IERC20 public token;
+    Custody public custody;
+    mapping(uint256 => bytes32) public claimRoots;
+    mapping(address => uint256) public totalPayoutsFor;
+    uint256 public totalClaimed;
+    uint256 public lastRootBlock;
 
-  event RewarderDeployed(uint256 tokenStart, address uniswapPair);
-  event PriceUpdated(uint256 pricePerBlock, uint256 blocksPeriod);
-  event RootUpdated(bytes32 root, uint256 blockNumber);
-  event UnclaimedChanged(uint256 totalUnclaimed);
-  event Airdrop(uint256 totalDropped);
-  event BanChanged(address account, bool banned);
+    event RootUpdated(bytes32 root, uint256 blockNumber, uint256 _totalAmount);
+    event Airdrop(uint256 totalDropped);
+    event ClaimedChanged(uint256 totalUnclaimed);
 
-  constructor(
-    address _token,
-    address payable _custody,
-    address _uniswapPair,
-    uint256 _tokenStart
-  ) {
-    token = IERC20(_token);
-    custody = Custody(_custody);
-    deployBlock = block.number;
-    lastBlockNumber = block.number;
-    lastRootBlock = block.number;
-    emit RewarderDeployed(_tokenStart, _uniswapPair);
-    emit RootUpdated(0x0, block.number);
-    _doBan(_custody, true);
-  }
-
-  function airdrop(address[] calldata beneficiaries, uint256[] calldata totalEarnings) external onlyOwner {
-    require(beneficiaries.length == totalEarnings.length, "Invalid array length");
-
-    uint256[] memory amounts = new uint256[](totalEarnings.length);
-
-    uint256 total = 0;
-    for (uint256 i = 0; i < beneficiaries.length; i++) {
-      address beneficiary = beneficiaries[i];
-      uint256 totalEarned = totalEarnings[i];
-      uint256 totalReceived = totalPayoutsFor[beneficiary];
-      require(totalEarned >= totalReceived, "Invalid batch");
-      uint256 amount = totalEarned.sub(totalReceived);
-
-      if (amount == 0) continue;
-
-      amounts[i] = amount;
-      total = total.add(amount);
-      totalPayoutsFor[beneficiary] = totalEarned;
+    constructor(
+                address _token,
+                address payable _custody
+                ) {
+        token = IERC20(_token);
+        custody = Custody(_custody);
+        lastRootBlock = block.number;
+        emit RootUpdated(0x0, block.number, 0);
     }
 
-    if (total == 0) return;
+    function airdrop(address[] calldata _beneficiaries, uint256[] calldata _totalEarnings) external onlyOwner {
+        require(_beneficiaries.length == _totalEarnings.length, "Invalid array length");
 
-    decreaseUnclaimed(total);
-    for (uint256 i = 0; i < beneficiaries.length; i++) {
-      token.safeTransfer(beneficiaries[i], amounts[i]);
-    }
-    emit Airdrop(total);
-  }
+        uint256[] memory amounts = new uint256[](_totalEarnings.length);
 
-  function updatePrice(uint256 newPricePerBlock, uint256 blocksPeriod) public onlyOwner {
-    uint256 blocksPassed = block.number.sub(lastBlockNumber);
+        uint256 _total = 0;
+        for (uint256 i = 0; i < _beneficiaries.length; i++) {
+            address _beneficiary = _beneficiaries[i];
+            uint256 _totalEarned = _totalEarnings[i];
+            uint256 _totalReceived = totalPayoutsFor[_beneficiary];
+            require(_totalEarned >= _totalReceived, "Invalid batch");
+            uint256 _amount = _totalEarned - _totalReceived;
 
-    uint256 tokensToReturn;
-    if (blocksPassed < lastBlocksPeriod) {
-      tokensToReturn = lastBlocksPeriod.sub(blocksPassed).mul(pricePerBlock);
-    }
-    uint256 totalReward = newPricePerBlock.mul(blocksPeriod);
+            if (_amount == 0) continue;
 
-    if (totalReward > tokensToReturn) {
-      uint256 toWithdraw = totalReward.sub(tokensToReturn);
-      increaseUnclaimed(toWithdraw);
-      custody.withdraw(address(token), toWithdraw);
-    } else if (totalReward < tokensToReturn) {
-      uint256 toDeposit = tokensToReturn.sub(totalReward);
-      decreaseUnclaimed(toDeposit);
-      token.safeTransfer(address(custody), toDeposit);
-    }
+            amounts[i] = _amount;
+            _total = _total + _amount;
+            totalPayoutsFor[_beneficiary] = _totalEarned;
+        }
 
-    pricePerBlock = newPricePerBlock;
-    lastBlockNumber = block.number;
-    lastBlocksPeriod = blocksPeriod;
+        if (_total == 0) return;
 
-    emit PriceUpdated(newPricePerBlock, blocksPeriod);
-  }
-
-  function updateRoot(bytes32 claimRoot, uint256 blockNumber) public onlyOwner {
-    require(blockNumber < block.number, "Invalid block number");
-    require(lastRootBlock < blockNumber, "Invalid block number");
-
-    lastRootBlock = blockNumber;
-    claimRoots[blockNumber] = claimRoot;
-    emit RootUpdated(claimRoot, blockNumber);
-  }
-
-  function claim(address recipient, uint256 totalEarned, uint256 blockNumber, bytes32[] calldata proof) external {
-    require(isValidProof(recipient, totalEarned, blockNumber, proof), "Invalid proof");
-
-    uint256 totalReceived = totalPayoutsFor[recipient];
-    require(totalEarned >= totalReceived, "Already paid");
-
-    uint256 amount = totalEarned.sub(totalReceived);
-    if (amount == 0) return;
-
-    totalPayoutsFor[recipient] = totalEarned;
-    decreaseUnclaimed(amount);
-    token.safeTransfer(recipient, amount);
-  }
-
-  function isValidProof(address recipient, uint256 totalEarned, uint256 blockNumber, bytes32[] calldata proof) public view returns (bool) {
-    uint256 chainId;
-    assembly {
-      chainId := chainid()
-    }
-    bytes32 leaf = keccak256(abi.encodePacked(recipient, totalEarned, chainId, address(this)));
-    bytes32 root = claimRoots[blockNumber];
-    return proof.verify(root, leaf);
-  }
-
-  function recoverTokens(IERC20 erc20, address to, uint256 amount) public onlyOwner {
-    uint256 balance = erc20.balanceOf(address(this));
-
-    if (address(erc20) == address(token)) {
-      balance = balance.sub(totalUnclaimed);
+        increaseClaimed(_total);
+        for (uint256 i = 0; i < _beneficiaries.length; i++) {
+            token.transfer(_beneficiaries[i], amounts[i]);
+        }
+        emit Airdrop(_total);
     }
 
-    require(balance >= amount, "Given amount is larger than recoverable balance");
-    erc20.safeTransfer(to, amount);
-  }
+    function updateRoot(bytes32 _claimRoot, uint256 _blockNumber, uint256 _totalReward) public onlyOwner {
+        require(_blockNumber < block.number, "Given block number must be less than current block number");
+        require(_blockNumber > lastRootBlock, "Given block number must be more than last root block");
+        require(_totalReward > totalClaimed, "Total reward must be bigger than total claimed");
 
-  function ban(address account) public onlyOwner {
-    _doBan(account, true);
-  }
+        uint256 _requiredTokens = _totalReward - totalClaimed;
+        uint256 _currentBalance = token.balanceOf(address(this));
+        if (_requiredTokens > _currentBalance) {
+            custody.withdraw(_requiredTokens - _currentBalance);
+        }
 
-  function unban(address account) public onlyOwner {
-    require(account != address(custody), "Custody address");
-    _doBan(account, false);
-  }
+        lastRootBlock = _blockNumber;
+        claimRoots[_blockNumber] = _claimRoot;
+        emit RootUpdated(_claimRoot, _blockNumber, _totalReward);
+    }
 
-  function _doBan(address _account, bool _ban) internal {
-    banlist[_account] = _ban;
-    emit BanChanged(_account, _ban);
-  }
+    function claim(address _recipient, uint256 _totalEarned, uint256 _blockNumber, bytes32[] calldata _proof) external {
+        require(isValidProof(_recipient, _totalEarned, _blockNumber, _proof), "Invalid proof");
 
-  function increaseUnclaimed(uint256 delta) internal {
-    totalUnclaimed = totalUnclaimed.add(delta);
-    emit UnclaimedChanged(totalUnclaimed);
-  }
+        uint256 _totalReceived = totalPayoutsFor[_recipient];
+        require(_totalEarned >= _totalReceived, "Already paid");
 
-  function decreaseUnclaimed(uint256 delta) internal {
-    totalUnclaimed = totalUnclaimed.sub(delta);
-    emit UnclaimedChanged(totalUnclaimed);
-  }
+        uint256 _amount = _totalEarned - _totalReceived;
+        if (_amount == 0) return;
+
+        totalPayoutsFor[_recipient] = _totalEarned;
+        increaseClaimed(_amount);
+        token.transfer(_recipient, _amount);
+    }
+
+    function isValidProof(address _recipient, uint256 _totalEarned, uint256 _blockNumber, bytes32[] calldata _proof) public view returns (bool) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+
+        bytes32 leaf = keccak256(abi.encodePacked(_recipient, _totalEarned, chainId, address(this)));
+        bytes32 root = claimRoots[_blockNumber];
+        return _proof.verify(root, leaf);
+    }
+
+    function recoverTokens(IERC20 _erc20, address _to) public onlyOwner {
+        require(address(_erc20) != address(token), "You can't recover default token");
+        uint256 _balance = _erc20.balanceOf(address(this));
+        _erc20.transfer(_to, _balance);
+    }
+
+    function increaseClaimed(uint256 delta) internal {
+        totalClaimed = totalClaimed + delta;
+        emit ClaimedChanged(totalClaimed);
+    }
 }
