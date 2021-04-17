@@ -6,6 +6,7 @@
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
     "accounts": "npx hardhat accounts",
+    "deploy": "npx hardhat run --network goerli scripts/deploy.js",
     "node": "npx hardhat node"
   },
   "dependencies": {
