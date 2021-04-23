@@ -40,7 +40,7 @@ npx hardhat run --network goerli scripts/deploy.js
 - Custody smart contract:
 [0xF4eec243A31ed1a8C19009648E615686597FF825](https://goerli.etherscan.io/address/0xF4eec243A31ed1a8C19009648E615686597FF825)
 
-- Hermes smart contract:
+- Rewarder smart contract:
 [0x52f50139892611515586007c26e31e6751F78a1D](https://goerli.etherscan.io/address/0x52f50139892611515586007c26e31e6751F78a1D)
 
 - MYSTTv2 Token: [0xf74a5ca65E4552CfF0f13b116113cCb493c580C5](https://goerli.etherscan.io/address/0xf74a5ca65E4552CfF0f13b116113cCb493c580C5)
