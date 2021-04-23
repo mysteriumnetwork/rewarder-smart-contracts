@@ -38,9 +38,9 @@ npx hardhat run --network goerli scripts/deploy.js
 ## Current deployment (ethereum Görli testnet)
 
 - Custody smart contract:
-[0xF4eec243A31ed1a8C19009648E615686597FF825](https://goerli.etherscan.io/address/0xF4eec243A31ed1a8C19009648E615686597FF825)
+[0xa0cFb3B6869CB3dF6876aa95bc8603F24f47a853](https://goerli.etherscan.io/address/0xF4eec243A31ed1a8C19009648E615686597FF825)
 
 - Rewarder smart contract:
-[0x52f50139892611515586007c26e31e6751F78a1D](https://goerli.etherscan.io/address/0x52f50139892611515586007c26e31e6751F78a1D)
+[0x011305BA8B9442D167377DC0BD77C4da79c8e6f1](https://goerli.etherscan.io/address/0x011305BA8B9442D167377DC0BD77C4da79c8e6f1)
 
 - MYSTTv2 Token: [0xf74a5ca65E4552CfF0f13b116113cCb493c580C5](https://goerli.etherscan.io/address/0xf74a5ca65E4552CfF0f13b116113cCb493c580C5)

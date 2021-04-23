@@ -3,7 +3,7 @@ const hre = require("hardhat");
 async function main() {
   // Test Mysterium token (MYSTT) on Goerli testnet
   const tokenAddress = "0xf74a5ca65e4552cff0f13b116113ccb493c580c5";
-  const ownerAddress = "0xC6b139344239b9E33F8dec27DE5Bd7E2a45F0374";
+  const ownerAddress = "0x3ec4a6356de5a0403e59fabdc76dc0845b271760";
 
   // Get the ContractFactory here.
   const Custody = await ethers.getContractFactory("Custody");
