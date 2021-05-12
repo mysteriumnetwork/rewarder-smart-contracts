@@ -13,6 +13,13 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC
       }
+    },
+    matic: {
+      url: "https://rpc-mainnet.maticvigil.com/v1/...",
+      chainId: 137,
+      accounts: {
+        mnemonic: MNEMONIC
+      }
     }
   }
 }

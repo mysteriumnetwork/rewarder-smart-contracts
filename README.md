@@ -7,9 +7,9 @@ This approach also allows to reduce blockchain transaction fees for both Mysteri
 This is also more trustless way for reward distribution (and more similar to how it will work on MainNet). Once rewards are distributed (added new merkle root into blockchain), team can't take them back, even if user is not claiming them for very long time.
 
 There are two main smart contracts:
+
 - `Custody.sol` which holds bigger amount of tokens which will be used in future payouts.
 - `Rewarder.sol` holds main payout and rewards claiming logic. Each time during reward distribution there will be sent new merkle tree root and users will get merkle proofs (via off-chain channels, e.g. in node or affiliate dashboards) which allows to claim rewards.
-
 
 ## Setup and test
 
@@ -37,10 +37,19 @@ npx hardhat run --network goerli scripts/deploy.js
 
 ## Current deployment (ethereum Görli testnet)
 
+### Goerli
+
 - Custody smart contract:
-[0xa0cFb3B6869CB3dF6876aa95bc8603F24f47a853](https://goerli.etherscan.io/address/0xF4eec243A31ed1a8C19009648E615686597FF825)
+  [0xa0cFb3B6869CB3dF6876aa95bc8603F24f47a853](https://goerli.etherscan.io/address/0xF4eec243A31ed1a8C19009648E615686597FF825)
 
 - Rewarder smart contract:
-[0x011305BA8B9442D167377DC0BD77C4da79c8e6f1](https://goerli.etherscan.io/address/0x011305BA8B9442D167377DC0BD77C4da79c8e6f1)
+  [0x011305BA8B9442D167377DC0BD77C4da79c8e6f1](https://goerli.etherscan.io/address/0x011305BA8B9442D167377DC0BD77C4da79c8e6f1)
 
 - MYSTTv2 Token: [0xf74a5ca65E4552CfF0f13b116113cCb493c580C5](https://goerli.etherscan.io/address/0xf74a5ca65E4552CfF0f13b116113cCb493c580C5)
+
+### Matic (mainnet)
+
+- Custody smart contract: [0x40daF900e795F97d704F1CcD83588878d46d0288](https://polygon-explorer-mainnet.chainstacklabs.com/address/0x40daF900e795F97d704F1CcD83588878d46d0288)
+
+- Rewarder smart contract:
+  [0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7](https://polygon-explorer-mainnet.chainstacklabs.com/address/0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7)
