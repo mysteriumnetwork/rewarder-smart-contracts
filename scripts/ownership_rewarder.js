@@ -1,6 +1,6 @@
 const hre = require("hardhat");
 
-async function transfer() {
+async function transferRewarder() {
   const rewarderAddress = "0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7";
   const ownerAddress = "NEW_OWNER";
 
@@ -18,7 +18,7 @@ async function transfer() {
   console.log("New owner:", ownerAddress);
 }
 
-transfer()
+transferRewarder()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error);

@@ -8,7 +8,7 @@ module.exports = {
   networks: {
     hardhat: {},
     goerli: {
-      url: "https://goerli.infura.io/v3/...",
+      url: "https://goerli.infura.io/...",
       accounts: {
         mnemonic: MNEMONIC,
       },

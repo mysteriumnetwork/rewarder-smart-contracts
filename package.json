@@ -6,9 +6,11 @@
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
     "accounts": "npx hardhat accounts",
-    "transfer-owner": "npx hardhat run --network matic scripts/transfer.js",
-    "deploy": "npx hardhat run --network matic scripts/deploy.js",
+    "transfer-owner-rewarder": "npx hardhat run --network goerli scripts/ownership_rewarder.js",
+    "transfer-owner-custody": "npx hardhat run --network goerli scripts/ownership_custody.js",
+    "deploy-testnet-custody": "npx hardhat run --network goerli scripts/deploy_custody.js",
     "deploy-testnet": "npx hardhat run --network goerli scripts/deploy.js",
+    "deploy": "npx hardhat run --network matic scripts/deploy.js",
     "node": "npx hardhat node"
   },
   "dependencies": {
