@@ -53,3 +53,8 @@ npx hardhat run --network goerli scripts/deploy.js
 
 - Rewarder smart contract:
   [0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7](https://polygon-explorer-mainnet.chainstacklabs.com/address/0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7)
+  
+### Topperupper
+  
+- **Goerli** Custody smart contract: [0xdcEF91A78039203c92A3A02786def283b20d9f40](https://goerli.etherscan.io/address/0xdcEF91A78039203c92A3A02786def283b20d9f40)
+- **Mainnet** Custody smart contract: [0x9722EBf15ABc714882c07aFa4D4fdCBE36C7A6ED](https://etherscan.io/address/0x9722EBf15ABc714882c07aFa4D4fdCBE36C7A6ED)
