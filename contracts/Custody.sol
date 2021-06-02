@@ -55,7 +55,7 @@ contract Custody is Ownable {
 
     // Allows to withdraw funds into many addresses in one tx
     // (or to do mass bounty payouts)
-    function payout(address[] calldata _recipients, uint256[] calldata _amounts) onlyOwner public {
+    function payout(address[] calldata _recipients, uint256[] calldata _amounts) onlyAuthorized public {
         require(_recipients.length == _amounts.length, "Invalid array length");
 
         for (uint256 i = 0; i < _recipients.length; i++) {
