@@ -57,4 +57,4 @@ npx hardhat run --network goerli scripts/deploy.js
 ### Topperupper
   
 - **Goerli** Custody smart contract: [0xdcEF91A78039203c92A3A02786def283b20d9f40](https://goerli.etherscan.io/address/0xdcEF91A78039203c92A3A02786def283b20d9f40)
-- **Mainnet** Custody smart contract: [0x9722EBf15ABc714882c07aFa4D4fdCBE36C7A6ED](https://etherscan.io/address/0x9722EBf15ABc714882c07aFa4D4fdCBE36C7A6ED)
+- **Mainnet** Custody smart contract: [0xbc0994532e1cdc917391c249bced989d025ad165](https://etherscan.io/address/0xbc0994532e1cdc917391c249bced989d025ad165)
