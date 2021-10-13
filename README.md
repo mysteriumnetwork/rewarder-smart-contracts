@@ -47,14 +47,22 @@ npx hardhat run --network goerli scripts/deploy.js
 
 - MYSTTv2 Token: [0xf74a5ca65E4552CfF0f13b116113cCb493c580C5](https://goerli.etherscan.io/address/0xf74a5ca65E4552CfF0f13b116113cCb493c580C5)
 
-### Matic (mainnet)
+### Matic mainnet
+
+#### Current
+
+- Custody smart contract: [0x50A1937E6A81fcCDe12542FaE9333a1afc156a6C](https://polygonscan.com/address/0x50A1937E6A81fcCDe12542FaE9333a1afc156a6C)
+
+- Rewarder smart contract: [0x7614Ab77B2E5F954D95Da7fe508cCC2Bcf6cA317](https://polygonscan.com/address/0x7614Ab77B2E5F954D95Da7fe508cCC2Bcf6cA317)
+
+#### Old
 
 - Custody smart contract: [0x40daF900e795F97d704F1CcD83588878d46d0288](https://polygon-explorer-mainnet.chainstacklabs.com/address/0x40daF900e795F97d704F1CcD83588878d46d0288)
 
 - Rewarder smart contract:
   [0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7](https://polygon-explorer-mainnet.chainstacklabs.com/address/0x9799Be613DFa2ab4E971E6fBA51630c77D526Bb7)
-  
-### Topperupper
-  
+
+### Topperupper (deprecated)
+
 - **Goerli** Custody smart contract: [0xdcEF91A78039203c92A3A02786def283b20d9f40](https://goerli.etherscan.io/address/0xdcEF91A78039203c92A3A02786def283b20d9f40)
 - **Mainnet** Custody smart contract: [0xbc0994532e1cdc917391c249bced989d025ad165](https://etherscan.io/address/0xbc0994532e1cdc917391c249bced989d025ad165)
