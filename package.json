@@ -7,6 +7,7 @@
     "compile": "npx hardhat compile",
     "accounts": "npx hardhat accounts",
     "transfer-owner-rewarder": "npx hardhat run --network goerli scripts/ownership_rewarder.js",
+    "withdraw-all": "npx hardhat run --network matic scripts/withdraw.js",
     "transfer-owner-custody": "npx hardhat run --network goerli scripts/ownership_custody.js",
     "deploy-testnet-custody": "npx hardhat run --network goerli scripts/deploy_custody.js",
     "deploy-testnet": "npx hardhat run --network goerli scripts/deploy.js",
